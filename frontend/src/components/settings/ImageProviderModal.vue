@@ -125,6 +125,23 @@
             启用后使用精简版提示词，适合有字符限制的 API（如即梦 1600 字符限制）。
           </span>
         </div>
+
+        <!-- 流式模式 -->
+        <div class="form-group">
+          <label class="toggle-label">
+            <span>流式模式 (Stream Mode)</span>
+            <div
+              class="toggle-switch"
+              :class="{ active: formData.stream }"
+              @click="updateField('stream', !formData.stream)"
+            >
+              <div class="toggle-slider"></div>
+            </div>
+          </label>
+          <span class="form-hint">
+            启用流式响应模式。部分 API（如 flow2api）要求必须开启此选项才能正常生成图片。
+          </span>
+        </div>
       </div>
 
       <div class="modal-footer">
@@ -170,6 +187,7 @@ interface FormData {
   endpoint_type?: string
   high_concurrency?: boolean
   short_prompt?: boolean
+  stream?: boolean
 }
 
 // 定义类型选项

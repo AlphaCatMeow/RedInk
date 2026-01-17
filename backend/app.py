@@ -1,5 +1,7 @@
 import logging
 import sys
+import os
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from flask import Flask, send_from_directory
 from flask_cors import CORS
@@ -9,6 +11,11 @@ from backend.routes import register_routes
 
 def setup_logging():
     """配置日志系统"""
+    # 确保 logs 目录存在
+    log_dir = Path(__file__).parent.parent / 'logs'
+    log_dir.mkdir(exist_ok=True)
+    log_file = log_dir / 'backend.log'
+
     # 创建根日志器
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
@@ -16,7 +23,7 @@ def setup_logging():
     # 清除已有的处理器
     root_logger.handlers.clear()
 
-    # 控制台处理器 - 详细格式
+    # 1. 控制台处理器 - 详细格式
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(logging.DEBUG)
     console_format = logging.Formatter(
@@ -26,6 +33,20 @@ def setup_logging():
     )
     console_handler.setFormatter(console_format)
     root_logger.addHandler(console_handler)
+
+    # 2. 文件处理器 - 滚动日志 (10MB * 5)
+    file_handler = RotatingFileHandler(
+        log_file,
+        maxBytes=10 * 1024 * 1024,  # 10MB
+        backupCount=5,
+        encoding='utf-8'
+    )
+    file_handler.setLevel(logging.DEBUG)
+    file_format = logging.Formatter(
+        '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+    )
+    file_handler.setFormatter(file_format)
+    root_logger.addHandler(file_handler)
 
     # 设置各模块的日志级别
     logging.getLogger('backend').setLevel(logging.DEBUG)

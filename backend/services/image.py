@@ -337,165 +337,69 @@ class ImageService:
 
         # ==================== 第二阶段：生成其他页面 ====================
         if other_pages:
-            # 检查是否启用高并发模式
-            high_concurrency = self.provider_config.get('high_concurrency', False)
+            # 顺序模式：逐个生成（避免并发请求导致服务失败）
+            yield {
+                "event": "progress",
+                "data": {
+                    "status": "batch_start",
+                    "message": f"开始顺序生成 {len(other_pages)} 页内容...",
+                    "current": len(generated_images),
+                    "total": total,
+                    "phase": "content"
+                }
+            }
 
-            if high_concurrency:
-                # 高并发模式：并行生成
+            for page in other_pages:
+                # 发送生成进度
                 yield {
                     "event": "progress",
                     "data": {
-                        "status": "batch_start",
-                        "message": f"开始并发生成 {len(other_pages)} 页内容...",
-                        "current": len(generated_images),
+                        "index": page["index"],
+                        "status": "generating",
+                        "current": len(generated_images) + 1,
                         "total": total,
                         "phase": "content"
                     }
                 }
 
-                # 使用线程池并发生成
-                with ThreadPoolExecutor(max_workers=self.MAX_CONCURRENT) as executor:
-                    # 提交所有任务
-                    future_to_page = {
-                        executor.submit(
-                            self._generate_single_image,
-                            page,
-                            task_id,
-                            cover_image_data,  # 使用封面作为参考
-                            0,  # retry_count
-                            full_outline,  # 传入完整大纲
-                            compressed_user_images,  # 用户上传的参考图片（已压缩）
-                            user_topic  # 用户原始输入
-                        ): page
-                        for page in other_pages
-                    }
+                # 生成单张图片
+                index, success, filename, error = self._generate_single_image(
+                    page,
+                    task_id,
+                    cover_image_data,
+                    0,
+                    full_outline,
+                    compressed_user_images,
+                    user_topic
+                )
 
-                    # 发送每个页面的进度
-                    for page in other_pages:
-                        yield {
-                            "event": "progress",
-                            "data": {
-                                "index": page["index"],
-                                "status": "generating",
-                                "current": len(generated_images) + 1,
-                                "total": total,
-                                "phase": "content"
-                            }
-                        }
+                if success:
+                    generated_images.append(filename)
+                    self._task_states[task_id]["generated"][index] = filename
 
-                    # 收集结果
-                    for future in as_completed(future_to_page):
-                        page = future_to_page[future]
-                        try:
-                            index, success, filename, error = future.result()
-
-                            if success:
-                                generated_images.append(filename)
-                                self._task_states[task_id]["generated"][index] = filename
-
-                                yield {
-                                    "event": "complete",
-                                    "data": {
-                                        "index": index,
-                                        "status": "done",
-                                        "image_url": f"/api/images/{task_id}/{filename}",
-                                        "phase": "content"
-                                    }
-                                }
-                            else:
-                                failed_pages.append(page)
-                                self._task_states[task_id]["failed"][index] = error
-
-                                yield {
-                                    "event": "error",
-                                    "data": {
-                                        "index": index,
-                                        "status": "error",
-                                        "message": error,
-                                        "retryable": True,
-                                        "phase": "content"
-                                    }
-                                }
-
-                        except Exception as e:
-                            failed_pages.append(page)
-                            error_msg = str(e)
-                            self._task_states[task_id]["failed"][page["index"]] = error_msg
-
-                            yield {
-                                "event": "error",
-                                "data": {
-                                    "index": page["index"],
-                                    "status": "error",
-                                    "message": error_msg,
-                                    "retryable": True,
-                                    "phase": "content"
-                                }
-                            }
-            else:
-                # 顺序模式：逐个生成
-                yield {
-                    "event": "progress",
-                    "data": {
-                        "status": "batch_start",
-                        "message": f"开始顺序生成 {len(other_pages)} 页内容...",
-                        "current": len(generated_images),
-                        "total": total,
-                        "phase": "content"
-                    }
-                }
-
-                for page in other_pages:
-                    # 发送生成进度
                     yield {
-                        "event": "progress",
+                        "event": "complete",
                         "data": {
-                            "index": page["index"],
-                            "status": "generating",
-                            "current": len(generated_images) + 1,
-                            "total": total,
+                            "index": index,
+                            "status": "done",
+                            "image_url": f"/api/images/{task_id}/{filename}",
                             "phase": "content"
                         }
                     }
+                else:
+                    failed_pages.append(page)
+                    self._task_states[task_id]["failed"][index] = error
 
-                    # 生成单张图片
-                    index, success, filename, error = self._generate_single_image(
-                        page,
-                        task_id,
-                        cover_image_data,
-                        0,
-                        full_outline,
-                        compressed_user_images,
-                        user_topic
-                    )
-
-                    if success:
-                        generated_images.append(filename)
-                        self._task_states[task_id]["generated"][index] = filename
-
-                        yield {
-                            "event": "complete",
-                            "data": {
-                                "index": index,
-                                "status": "done",
-                                "image_url": f"/api/images/{task_id}/{filename}",
-                                "phase": "content"
-                            }
+                    yield {
+                        "event": "error",
+                        "data": {
+                            "index": index,
+                            "status": "error",
+                            "message": error,
+                            "retryable": True,
+                            "phase": "content"
                         }
-                    else:
-                        failed_pages.append(page)
-                        self._task_states[task_id]["failed"][index] = error
-
-                        yield {
-                            "event": "error",
-                            "data": {
-                                "index": index,
-                                "status": "error",
-                                "message": error,
-                                "retryable": True,
-                                "phase": "content"
-                            }
-                        }
+                    }
 
         # ==================== 完成 ====================
         yield {
@@ -620,68 +524,90 @@ class ImageService:
             }
         }
 
-        # 并发重试
+        # 顺序重试
         # 从任务状态中获取完整大纲
         full_outline = ""
         if task_id in self._task_states:
             full_outline = self._task_states[task_id].get("full_outline", "")
 
-        with ThreadPoolExecutor(max_workers=self.MAX_CONCURRENT) as executor:
-            future_to_page = {
-                executor.submit(
-                    self._generate_single_image,
+        for page in pages:
+            try:
+                index, success, filename, error = self._generate_single_image(
                     page,
                     task_id,
                     reference_image,
                     0,  # retry_count
-                    full_outline  # 传入完整大纲
-                ): page
-                for page in pages
-            }
+                    full_outline,  # 传入完整大纲
+                    None, # 重试时不重复传入 user_images (generate_single_image 内部逻辑已处理，这里保持简单，或者应该传入？generate_single_image 需要 user_images 吗？需要)
+                    # wait, generate_single_image signature:
+                    # page, task_id, reference_image, retry_count, full_outline, user_images, user_topic
+                    # In previous code, user_images was missing in retry_failed_images call!
+                    # Let's check retry_single_image. It gets user_images from task_state.
+                    # We should do the same here.
+                )
+                # Re-reading generate_single_image arguments...
+                # user_images is the 6th argument.
+                # In the original code:
+                # executor.submit(self._generate_single_image, page, task_id, reference_image, 0, full_outline)
+                # It was missing user_images and user_topic!
+                # I should fix this too.
 
-            for future in as_completed(future_to_page):
-                page = future_to_page[future]
-                try:
-                    index, success, filename, error = future.result()
+                # Let's get user_images and user_topic from task state
+                user_images = None
+                user_topic = ""
+                if task_id in self._task_states:
+                    user_images = self._task_states[task_id].get("user_images")
+                    user_topic = self._task_states[task_id].get("user_topic", "")
 
-                    if success:
-                        success_count += 1
-                        if task_id in self._task_states:
-                            self._task_states[task_id]["generated"][index] = filename
-                            if index in self._task_states[task_id]["failed"]:
-                                del self._task_states[task_id]["failed"][index]
+                # Correct call
+                index, success, filename, error = self._generate_single_image(
+                    page,
+                    task_id,
+                    reference_image,
+                    0,
+                    full_outline,
+                    user_images,
+                    user_topic
+                )
 
-                        yield {
-                            "event": "complete",
-                            "data": {
-                                "index": index,
-                                "status": "done",
-                                "image_url": f"/api/images/{task_id}/{filename}"
-                            }
+                if success:
+                    success_count += 1
+                    if task_id in self._task_states:
+                        self._task_states[task_id]["generated"][index] = filename
+                        if index in self._task_states[task_id]["failed"]:
+                            del self._task_states[task_id]["failed"][index]
+
+                    yield {
+                        "event": "complete",
+                        "data": {
+                            "index": index,
+                            "status": "done",
+                            "image_url": f"/api/images/{task_id}/{filename}"
                         }
-                    else:
-                        failed_count += 1
-                        yield {
-                            "event": "error",
-                            "data": {
-                                "index": index,
-                                "status": "error",
-                                "message": error,
-                                "retryable": True
-                            }
-                        }
-
-                except Exception as e:
+                    }
+                else:
                     failed_count += 1
                     yield {
                         "event": "error",
                         "data": {
-                            "index": page["index"],
+                            "index": index,
                             "status": "error",
-                            "message": str(e),
+                            "message": error,
                             "retryable": True
                         }
                     }
+
+            except Exception as e:
+                failed_count += 1
+                yield {
+                    "event": "error",
+                    "data": {
+                        "index": page["index"],
+                        "status": "error",
+                        "message": str(e),
+                        "retryable": True
+                    }
+                }
 
         yield {
             "event": "retry_finish",

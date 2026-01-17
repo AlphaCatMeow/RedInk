@@ -25,7 +25,7 @@
         v-for="(page, idx) in store.outline.pages" 
         :key="page.index"
         class="card outline-card"
-        :draggable="true"
+        :draggable="focusedIndex !== idx"
         @dragstart="onDragStart($event, idx)"
         @dragover.prevent="onDragOver($event, idx)"
         @drop="onDrop($event, idx)"
@@ -39,13 +39,21 @@
           </div>
           
           <div class="card-controls">
-            <div class="drag-handle" title="拖拽排序">
+            <div class="drag-handle" title="拖拽排序" :style="{ cursor: focusedIndex === idx ? 'not-allowed' : 'grab', opacity: focusedIndex === idx ? 0.3 : 1 }">
                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"></circle><circle cx="9" cy="5" r="1"></circle><circle cx="9" cy="19" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="15" cy="5" r="1"></circle><circle cx="15" cy="19" r="1"></circle></svg>
             </div>
+            <button class="icon-btn" @click="generateSingleImage(idx)" title="生成此页图片" :disabled="generatingIndices.has(idx)">
+               <svg v-if="!generatingIndices.has(idx)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+               <svg v-else class="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
+            </button>
             <button class="icon-btn" @click="deletePage(idx)" title="删除此页">
                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
           </div>
+        </div>
+
+        <div v-if="getGeneratedImage(idx)" class="card-image-preview">
+          <img :src="getGeneratedImage(idx)" alt="Generated Preview" />
         </div>
 
         <textarea
@@ -53,6 +61,8 @@
           class="textarea-paper"
           placeholder="在此输入文案..."
           @input="store.updatePage(page.index, page.content)"
+          @focus="focusedIndex = idx"
+          @blur="focusedIndex = null"
         />
         
         <div class="word-count">{{ page.content.length }} 字</div>
@@ -75,7 +85,7 @@
 import { ref, nextTick, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGeneratorStore } from '../stores/generator'
-import { updateHistory, createHistory } from '../api'
+import { updateHistory, createHistory, regenerateImage } from '../api'
 
 const router = useRouter()
 const store = useGeneratorStore()
@@ -84,6 +94,10 @@ const dragOverIndex = ref<number | null>(null)
 const draggedIndex = ref<number | null>(null)
 // 保存状态指示
 const isSaving = ref(false)
+// 当前获取焦点的卡片索引
+const focusedIndex = ref<number | null>(null)
+// 正在生成的图片索引集合
+const generatingIndices = ref<Set<number>>(new Set())
 
 const getPageTypeName = (type: string) => {
   const names = {
@@ -92,6 +106,65 @@ const getPageTypeName = (type: string) => {
     summary: '总结'
   }
   return names[type as keyof typeof names] || '内容'
+}
+
+// 获取已生成的图片
+const getGeneratedImage = (index: number) => {
+  const image = store.images.find(img => img.index === index)
+  return image && image.status === 'done' ? image.url : null
+}
+
+// 生成单张图片
+const generateSingleImage = async (index: number) => {
+  // 如果没有 taskId，创建一个临时的（或者如果 store.recordId 存在，基于它）
+  if (!store.taskId) {
+    // 这里简单生成一个 taskId，实际应该由后端生成或者在 startGeneration 时生成
+    // 但为了支持单图生成，我们先生成一个
+    const newTaskId = `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    store.taskId = newTaskId
+    // 注意：这里没有显式调用后端创建任务，但 regenerateImage 需要 taskId
+    // 后端 image_routes.py 中的 regenerate_image 并没有检查 taskId 是否在 _task_states 中存在
+    // 而是通过 image_service.regenerate_image -> retry_single_image
+    // retry_single_image 会创建目录
+  }
+
+  generatingIndices.value.add(index)
+  try {
+    const page = store.outline.pages.find(p => p.index === index)
+    if (!page) return
+
+    const result = await regenerateImage(
+      store.taskId!,
+      page,
+      true, // useReference
+      {
+        fullOutline: store.outline.raw,
+        userTopic: store.topic
+      }
+    )
+
+    if (result.success && result.image_url) {
+      // 确保 store.images 中有该条目
+      let imageEntry = store.images.find(img => img.index === index)
+      if (!imageEntry) {
+        imageEntry = {
+          index: index,
+          url: '',
+          status: 'generating'
+        }
+        store.images.push(imageEntry)
+      }
+      store.updateImage(index, result.image_url)
+    } else {
+      console.error('Failed to generate image:', result.error)
+      alert(`生成失败: ${result.error}`)
+    }
+  } catch (e) {
+    console.error(e)
+    alert('生成请求失败，请重试')
+  } finally {
+    generatingIndices.value.delete(index)
+  }
 }
 
 // 拖拽逻辑
@@ -440,5 +513,39 @@ watch(
   font-size: 32px;
   font-weight: 300;
   margin-bottom: 8px;
+}
+
+.card-image-preview {
+  margin-bottom: 12px;
+  border-radius: 4px;
+  overflow: hidden;
+  height: 200px; /* 固定高度，保持卡片整洁 */
+  background: #f9f9f9;
+  border: 1px solid #eee;
+}
+
+.card-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.card-image-preview:hover img {
+  transform: scale(1.05);
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

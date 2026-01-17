@@ -363,6 +363,7 @@ export function useProviderForm() {
       model: provider.model || '',
       high_concurrency: provider.high_concurrency || false,
       short_prompt: provider.short_prompt || false,
+      stream: provider.stream || false,
       endpoint_type: provider.endpoint_type || '/v1/images/generations',
       _has_api_key: !!provider.api_key_masked
     }
@@ -405,7 +406,8 @@ export function useProviderForm() {
       type: imageForm.value.type,
       model: imageForm.value.model,
       high_concurrency: imageForm.value.high_concurrency,
-      short_prompt: imageForm.value.short_prompt
+      short_prompt: imageForm.value.short_prompt,
+      stream: imageForm.value.stream
     }
 
     // 如果是 OpenAI 兼容接口，保存 endpoint_type

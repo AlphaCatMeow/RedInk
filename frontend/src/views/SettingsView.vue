@@ -64,6 +64,9 @@
           @test="testImageProviderInList"
         />
       </div>
+
+      <!-- 系统日志 -->
+      <LogViewer />
     </div>
 
     <!-- 文本服务商弹窗 -->
@@ -100,6 +103,7 @@ import { onMounted } from 'vue'
 import ProviderTable from '../components/settings/ProviderTable.vue'
 import ProviderModal from '../components/settings/ProviderModal.vue'
 import ImageProviderModal from '../components/settings/ImageProviderModal.vue'
+import LogViewer from '../components/settings/LogViewer.vue'
 import {
   useProviderForm,
   textTypeOptions,

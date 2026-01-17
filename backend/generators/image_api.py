@@ -19,6 +19,7 @@ class ImageApiGenerator(ImageGeneratorBase):
         self.model = config.get('model', 'default-model')
         self.default_aspect_ratio = config.get('default_aspect_ratio', '3:4')
         self.image_size = config.get('image_size', '4K')
+        self.stream = config.get('stream', False)
 
         # 支持自定义端点路径
         endpoint_type = config.get('endpoint_type', '/v1/images/generations')
@@ -168,6 +169,21 @@ class ImageApiGenerator(ImageGeneratorBase):
         result = response.json()
         logger.debug(f"  API 响应: data 长度={len(result.get('data', []))}")
 
+        # 支持 flow2api 格式解析 (media -> image -> generatedImage -> fifeUrl)
+        if "media" in result and len(result["media"]) > 0:
+            try:
+                media_item = result["media"][0]
+                if "image" in media_item and "generatedImage" in media_item["image"]:
+                    fife_url = media_item["image"]["generatedImage"].get("fifeUrl")
+                    if fife_url:
+                        # 清理 URL (去除反引号和空白)
+                        # 示例: " `https://...` " -> "https://..."
+                        clean_url = fife_url.strip().strip('`').strip()
+                        logger.info(f"✅ 从 flow2api 响应中提取到 fifeUrl: {clean_url[:50]}...")
+                        return self._download_image(clean_url)
+            except Exception as e:
+                logger.warning(f"尝试解析 flow2api 响应失败: {e}")
+
         if "data" in result and len(result["data"]) > 0:
             item = result["data"][0]
 
@@ -238,16 +254,17 @@ class ImageApiGenerator(ImageGeneratorBase):
             "model": model,
             "messages": [{"role": "user", "content": user_content}],
             "max_tokens": 4096,
-            "temperature": 1.0
+            "temperature": 1.0,
+            "stream": self.stream
         }
 
         api_url = f"{self.base_url}{self.endpoint_type}"
-        logger.info(f"Chat API 生成图片: {api_url}, model={model}")
+        logger.info(f"Chat API 生成图片: {api_url}, model={model}, stream={self.stream}")
 
-        response = requests.post(api_url, headers=headers, json=payload, timeout=300)
+        response = requests.post(api_url, headers=headers, json=payload, timeout=300, stream=self.stream)
 
         if response.status_code != 200:
-            error_detail = response.text[:500]
+            error_detail = response.text[:5000]  # Increase limit to capture full error
             status_code = response.status_code
 
             if status_code == 401:
@@ -274,8 +291,38 @@ class ImageApiGenerator(ImageGeneratorBase):
                     f"【模型】{model}"
                 )
 
-        result = response.json()
-        logger.debug(f"Chat API 响应: {str(result)[:500]}")
+        if self.stream:
+            logger.info("处理流式响应...")
+            full_response_content = ""
+            for line in response.iter_lines():
+                if line:
+                    line_str = line.decode('utf-8').strip()
+                    if line_str.startswith("data: ") and line_str != "data: [DONE]":
+                        try:
+                            import json
+                            json_str = line_str[6:]  # Remove "data: " prefix
+                            chunk = json.loads(json_str)
+                            if "choices" in chunk and len(chunk["choices"]) > 0:
+                                delta = chunk["choices"][0].get("delta", {})
+                                if "content" in delta:
+                                    full_response_content += delta["content"]
+                        except Exception as e:
+                            logger.warning(f"解析流式 chunk 失败: {e}")
+            
+            # 构造一个伪造的完整响应对象，以便复用后续的解析逻辑
+            result = {
+                "choices": [
+                    {
+                        "message": {
+                            "content": full_response_content
+                        }
+                    }
+                ]
+            }
+            logger.debug(f"流式响应接收完成，总长度: {len(full_response_content)}")
+        else:
+            result = response.json()
+            logger.debug(f"Chat API 响应: {str(result)[:5000]}")  # Increase limit
 
         # 解析响应
         if "choices" in result and len(result["choices"]) > 0:
@@ -312,7 +359,7 @@ class ImageApiGenerator(ImageGeneratorBase):
 
         raise Exception(
             "❌ 无法从 Chat API 响应中提取图片数据\n\n"
-            f"【响应内容】\n{str(result)[:500]}\n\n"
+            f"【响应内容】\n{str(result)[:5000]}\n\n"  # Increase limit
             "【可能原因】\n"
             "1. 该模型不支持图片生成\n"
             "2. 响应格式与预期不符\n"
