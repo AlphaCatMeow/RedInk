@@ -250,9 +250,25 @@ onMounted(async () => {
 
   store.startGeneration()
 
+  // 过滤出需要生成的页面（排除已完成的）
+  const pagesToGenerate = store.outline.pages.filter(page => {
+    const existing = store.images.find(img => img.index === page.index)
+    return !existing || existing.status !== 'done' || !existing.url
+  })
+
+  // 如果所有页面都已生成，直接完成
+  if (pagesToGenerate.length === 0) {
+    if (!store.taskId) {
+      store.taskId = `task_${Date.now()}_existing`
+    }
+    store.finishGeneration(store.taskId)
+    router.push('/result')
+    return
+  }
+
   generateImagesPost(
-    store.outline.pages,
-    null,
+    pagesToGenerate,
+    store.taskId, // 传入当前任务ID（如果有）
     store.outline.raw,  // 传入完整大纲文本
     // onProgress
     (event) => {
@@ -278,8 +294,15 @@ onMounted(async () => {
       // 更新历史记录
       if (store.recordId) {
         try {
-          // 收集所有生成的图片文件名
-          const generatedImages = event.images.filter(img => img !== null)
+          // 构建完整的 generated 列表 (合并现有和新生成的)
+          // 注意：不能仅使用 event.images，因为那是增量生成的
+          const generatedImages = store.outline.pages.map(p => {
+            const img = store.images.find(i => i.index === p.index)
+            if (img && img.status === 'done' && img.url) {
+              return img.url.split('/').pop()?.split('?')[0] || ''
+            }
+            return ''
+          }).filter(name => name !== '')
 
           // 确定状态
           let status = 'completed'
@@ -288,15 +311,25 @@ onMounted(async () => {
           }
 
           // 获取封面图作为缩略图（只保存文件名，不是完整URL）
-          const thumbnail = generatedImages.length > 0 ? generatedImages[0] : null
+          // 优先使用第一页的图片
+          const firstPageImg = store.images.find(img => img.index === 0)
+          const thumbnail = (firstPageImg && firstPageImg.status === 'done' && firstPageImg.url)
+            ? firstPageImg.url.split('/').pop()?.split('?')[0]
+            : (generatedImages.length > 0 ? generatedImages[0] : null)
 
           await updateHistory(store.recordId, {
             images: {
               task_id: event.task_id,
-              generated: generatedImages
+              generated: store.outline.pages.map(p => {
+                 // 这里必须按照 pages 的顺序生成完整列表，包含空字符串占位
+                 const img = store.images.find(i => i.index === p.index)
+                 return (img && img.status === 'done' && img.url) 
+                   ? img.url.split('/').pop()?.split('?')[0] || '' 
+                   : ''
+              })
             },
             status: status,
-            thumbnail: thumbnail
+            thumbnail: thumbnail || undefined
           })
           console.log('历史记录已更新')
         } catch (e) {

@@ -155,6 +155,29 @@ const generateSingleImage = async (index: number) => {
         store.images.push(imageEntry)
       }
       store.updateImage(index, result.image_url)
+
+      // 同步到历史记录
+      if (store.recordId) {
+        try {
+          // 构建完整的 generated 列表
+          const generated = store.outline.pages.map(p => {
+            const img = store.images.find(i => i.index === p.index)
+            if (img && img.status === 'done' && img.url) {
+              return img.url.split('/').pop()?.split('?')[0] || ''
+            }
+            return ''
+          })
+
+          await updateHistory(store.recordId, {
+            images: {
+              task_id: store.taskId,
+              generated: generated
+            }
+          })
+        } catch (err) {
+          console.error('同步历史记录失败:', err)
+        }
+      }
     } else {
       console.error('Failed to generate image:', result.error)
       alert(`生成失败: ${result.error}`)

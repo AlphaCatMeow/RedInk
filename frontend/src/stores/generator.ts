@@ -290,15 +290,29 @@ export const useGeneratorStore = defineStore('generator', {
      */
     startGeneration() {
       this.stage = 'generating'
-      this.progress.current = 0
+      
+      // 检查已完成的图片数量
+      const completedCount = this.outline.pages.filter(page => {
+        const existing = this.images.find(img => img.index === page.index)
+        return existing && existing.status === 'done' && existing.url
+      }).length
+
+      this.progress.current = completedCount
       this.progress.total = this.outline.pages.length
       this.progress.status = 'generating'
-      // 为每个页面创建对应的图片占位对象
-      this.images = this.outline.pages.map(page => ({
-        index: page.index,
-        url: '',
-        status: 'generating'
-      }))
+      
+      // 为每个页面创建对应的图片占位对象，保留已完成的
+      this.images = this.outline.pages.map(page => {
+        const existing = this.images.find(img => img.index === page.index)
+        if (existing && existing.status === 'done' && existing.url) {
+          return existing
+        }
+        return {
+          index: page.index,
+          url: '',
+          status: 'generating'
+        }
+      })
     },
 
     /**
