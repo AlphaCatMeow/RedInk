@@ -30,7 +30,9 @@ class OpenAICompatibleGenerator(ImageGeneratorBase):
             )
 
         # 规范化 base_url：去除末尾 /v1
-        self.base_url = self.base_url.rstrip('/').rstrip('/v1')
+        self.base_url = self.base_url.rstrip('/')
+        if self.base_url.endswith('/v1'):
+            self.base_url = self.base_url[:-3]
 
         # 默认模型
         self.default_model = config.get('model', 'dall-e-3')

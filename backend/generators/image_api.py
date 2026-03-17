@@ -15,7 +15,9 @@ class ImageApiGenerator(ImageGeneratorBase):
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
         logger.debug("初始化 ImageApiGenerator...")
-        self.base_url = config.get('base_url', 'https://api.example.com').rstrip('/').rstrip('/v1')
+        self.base_url = config.get('base_url', 'https://api.example.com').rstrip('/')
+        if self.base_url.endswith('/v1'):
+            self.base_url = self.base_url[:-3]
         self.model = config.get('model', 'default-model')
         self.default_aspect_ratio = config.get('default_aspect_ratio', '3:4')
         self.image_size = config.get('image_size', '4K')

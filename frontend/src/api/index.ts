@@ -123,45 +123,49 @@ export async function retryFailedImages(
     const decoder = new TextDecoder()
     let buffer = ''
 
-    while (true) {
-      const { done, value } = await reader.read()
+    try {
+      while (true) {
+        const { done, value } = await reader.read()
 
-      if (done) break
+        if (done) break
 
-      buffer += decoder.decode(value, { stream: true })
-      const lines = buffer.split('\n\n')
-      buffer = lines.pop() || ''
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n\n')
+        buffer = lines.pop() || ''
 
-      for (const line of lines) {
-        if (!line.trim()) continue
+        for (const line of lines) {
+          if (!line.trim()) continue
 
-        const [eventLine, dataLine] = line.split('\n')
-        if (!eventLine || !dataLine) continue
+          const [eventLine, dataLine] = line.split('\n')
+          if (!eventLine || !dataLine) continue
 
-        const eventType = eventLine.replace('event: ', '').trim()
-        const eventData = dataLine.replace('data: ', '').trim()
+          const eventType = eventLine.replace('event: ', '').trim()
+          const eventData = dataLine.replace('data: ', '').trim()
 
-        try {
-          const data = JSON.parse(eventData)
+          try {
+            const data = JSON.parse(eventData)
 
-          switch (eventType) {
-            case 'retry_start':
-              onProgress({ index: -1, status: 'generating', message: data.message })
-              break
-            case 'complete':
-              onComplete(data)
-              break
-            case 'error':
-              onError(data)
-              break
-            case 'retry_finish':
-              onFinish(data)
-              break
+            switch (eventType) {
+              case 'retry_start':
+                onProgress({ index: -1, status: 'generating', message: data.message })
+                break
+              case 'complete':
+                onComplete(data)
+                break
+              case 'error':
+                onError(data)
+                break
+              case 'retry_finish':
+                onFinish(data)
+                break
+            }
+          } catch (e) {
+            console.error('解析 SSE 数据失败:', e)
           }
-        } catch (e) {
-          console.error('解析 SSE 数据失败:', e)
         }
       }
+    } finally {
+      reader.releaseLock()
     }
   } catch (error) {
     onStreamError(error as Error)
@@ -665,45 +669,49 @@ export async function generateImagesPost(
     const decoder = new TextDecoder()
     let buffer = ''
 
-    while (true) {
-      const { done, value } = await reader.read()
+    try {
+      while (true) {
+        const { done, value } = await reader.read()
 
-      if (done) break
+        if (done) break
 
-      buffer += decoder.decode(value, { stream: true })
-      const lines = buffer.split('\n\n')
-      buffer = lines.pop() || ''
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n\n')
+        buffer = lines.pop() || ''
 
-      for (const line of lines) {
-        if (!line.trim()) continue
+        for (const line of lines) {
+          if (!line.trim()) continue
 
-        const [eventLine, dataLine] = line.split('\n')
-        if (!eventLine || !dataLine) continue
+          const [eventLine, dataLine] = line.split('\n')
+          if (!eventLine || !dataLine) continue
 
-        const eventType = eventLine.replace('event: ', '').trim()
-        const eventData = dataLine.replace('data: ', '').trim()
+          const eventType = eventLine.replace('event: ', '').trim()
+          const eventData = dataLine.replace('data: ', '').trim()
 
-        try {
-          const data = JSON.parse(eventData)
+          try {
+            const data = JSON.parse(eventData)
 
-          switch (eventType) {
-            case 'progress':
-              onProgress(data)
-              break
-            case 'complete':
-              onComplete(data)
-              break
-            case 'error':
-              onError(data)
-              break
-            case 'finish':
-              onFinish(data)
-              break
+            switch (eventType) {
+              case 'progress':
+                onProgress(data)
+                break
+              case 'complete':
+                onComplete(data)
+                break
+              case 'error':
+                onError(data)
+                break
+              case 'finish':
+                onFinish(data)
+                break
+            }
+          } catch (e) {
+            console.error('解析 SSE 数据失败:', e)
           }
-        } catch (e) {
-          console.error('解析 SSE 数据失败:', e)
         }
       }
+    } finally {
+      reader.releaseLock()
     }
   } catch (error) {
     onStreamError(error as Error)

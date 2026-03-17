@@ -1,104 +1,99 @@
 <div align="center">
 
-<img src="images/2.png" alt="红墨 - 灵感一触即发 让创作从未如此简单" width="600"/>
+**[中文](./README_zh.md) | English**
 
-## 红墨官方站点上线啦，注册即送50体验积分！
+[![GitHub Stars](https://img.shields.io/github/stars/HisMax/RedInk?style=flat&logo=github)](https://github.com/HisMax/RedInk)
+[![License](https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-blue)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/histonemax/redink)](https://hub.docker.com/r/histonemax/redink)
+[![GitHub Release](https://img.shields.io/github/v/release/HisMax/RedInk?include_prereleases)](https://github.com/HisMax/RedInk/releases)
 
-## 注册需要邀请码！可以到 https://watcha.cn/square/discuss#post_id=1380 获取
+<img src="images/2_en.png" alt="RedInk - Inspiration at Your Fingertips, Making Creation Effortless" width="600"/>
 
-<div align="center">
-<a href="https://redink.top">
-  <img src="images/redink.png" alt="红墨在线体验" width="500" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"/>
-</a>
+#### [Official Site → Redink.top](https://redink.top)
 
-#### [点击访问在线体验站 → Redink.top](https://redink.top)
+<img src="images/showcase-grid-en.png" alt="Various social media covers generated with RedInk" width="700" style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);"/>
 
-
-</div>
-
-<img src="images/showcase-grid.png" alt="使用红墨生成的各类小红书封面" width="700" style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);"/>
-
-<sub>*使用红墨生成的各类小红书封面 - AI驱动，风格统一，文字准确*</sub>
+<sub>*Various social media covers generated with RedInk - AI-powered, consistent style, accurate text*</sub>
 
 </div>
 
 ---
 
-## ✨ 效果展示
+## ✨ Showcase
 
-### 输入一句话，生成完整图文
+### Type One Sentence, Get Complete Image & Text Posts
 
 <details open>
-<summary><b>Step 1: 智能大纲生成</b></summary>
+<summary><b>Step 1: Smart Outline Generation</b></summary>
 
 <br>
 
-![大纲示例](./images/example-2.png)
+![Outline Example](./images/example-2.png)
 
-**功能特性：**
-- ✏️ 可编辑每页内容
-- 🔄 可调整页面顺序（不建议）
-- ✨ 自定义每页描述（强烈推荐）
+**Features:**
+- ✏️ Edit content for each page
+- 🔄 Reorder pages (not recommended)
+- ✨ Custom description per page (highly recommended)
 
 </details>
 
 <details open>
-<summary><b>🎨 Step 2: 封面页生成</b></summary>
+<summary><b>🎨 Step 2: Cover Page Generation</b></summary>
 
 <br>
 
-![封面示例](./images/example-3.png)
+![Cover Example](./images/example-3.png)
 
-**封面亮点：**
-- 🎯 符合个人风格
-- 📝 文字准确无误
-- 🌈 视觉统一协调
+**Cover Highlights:**
+- 🎯 Matches your personal style
+- 📝 Accurate text rendering
+- 🌈 Visually consistent and coordinated
 
 </details>
 
 <details open>
-<summary><b>📚 Step 3: 内容页批量生成</b></summary>
+<summary><b>📚 Step 3: Batch Content Page Generation</b></summary>
 
 <br>
 
-![内容页示例](./images/example-4.png)
+![Content Page Example](./images/example-4.png)
 
-**生成说明：**
-- ⚡ 并发生成所有页面（默认最多 15 张）
-- ⚠️ 如 API 不支持高并发，请在设置中关闭
-- 🔧 支持单独重新生成不满意的页面
+**Generation Notes:**
+- ⚡ Concurrent generation for all pages (up to 15 by default)
+- ⚠️ Disable high concurrency in settings if your API doesn't support it
+- 🔧 Regenerate individual pages you're not satisfied with
 
 </details>
 
 ---
 
-## 🏗️ 技术架构
+## 🏗️ Tech Stack
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
-### 🔧 后端技术栈
+### 🔧 Backend
 
-| 技术 | 说明 |
+| Technology | Description |
 |------|------|
-| **语言** | Python 3.11+ |
-| **框架** | Flask |
-| **包管理** | uv |
-| **文案AI** | Gemini 3 |
-| **图片AI** | 🍌 Nano banana Pro |
+| **Language** | Python 3.11+ |
+| **Framework** | Flask |
+| **Package Manager** | uv |
+| **Text AI** | Gemini 3 |
+| **Image AI** | 🍌 Nano Banana Pro |
 
 </td>
 <td width="50%" valign="top">
 
-### 🎨 前端技术栈
+### 🎨 Frontend
 
-| 技术 | 说明 |
+| Technology | Description |
 |------|------|
-| **框架** | Vue 3 + TypeScript |
-| **构建工具** | Vite |
-| **状态管理** | Pinia |
-| **样式** | Modern CSS |
+| **Framework** | Vue 3 + TypeScript |
+| **Build Tool** | Vite |
+| **State Management** | Pinia |
+| **Styling** | Modern CSS |
 
 </td>
 </tr>
@@ -106,147 +101,147 @@
 
 ---
 
-## 📦 如何自己部署
+## 📦 Deployment
 
-### 方式一：Docker 部署（推荐）
+### Option 1: Docker (Recommended)
 
-**最简单的部署方式，一行命令即可启动：**
+**The simplest way — one command to start:**
 
 ```bash
 docker run -d -p 12398:12398 -v ./history:/app/history -v ./output:/app/output histonemax/redink:latest
 ```
 
-访问 http://localhost:12398，在 Web 界面的**设置页面**配置你的 API Key 即可使用。
+Visit http://localhost:12398 and configure your API Key in the **Settings** page.
 
-**使用 docker-compose（可选）：**
+**Using docker-compose (optional):**
 
-下载 [docker-compose.yml](https://github.com/HisMax/RedInk/blob/main/docker-compose.yml) 后：
+Download [docker-compose.yml](https://github.com/HisMax/RedInk/blob/main/docker-compose.yml), then:
 
 ```bash
 docker-compose up -d
 ```
 
-**Docker 部署说明：**
-- 容器内不包含任何 API Key，需要在 Web 界面配置
-- 使用 `-v ./history:/app/history` 持久化历史记录
-- 使用 `-v ./output:/app/output` 持久化生成的图片
-- 可选：挂载自定义配置文件 `-v ./text_providers.yaml:/app/text_providers.yaml`
+**Docker Notes:**
+- The container does not include any API Keys — configure them in the web UI
+- Use `-v ./history:/app/history` to persist history
+- Use `-v ./output:/app/output` to persist generated images
+- Optional: mount custom config `-v ./text_providers.yaml:/app/text_providers.yaml`
 
 ---
 
-### 方式二：本地开发部署
+### Option 2: Local Development
 
-**前置要求：**
+**Prerequisites:**
 - Python 3.11+
 - Node.js 18+
 - pnpm
 - uv
 
-### 1. 克隆项目
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/HisMax/RedInk.git
 cd RedInk
 ```
 
-### 2. 配置 API 服务
+### 2. Configure API Services
 
-复制配置模板文件：
+Copy the config templates:
 ```bash
 cp text_providers.yaml.example text_providers.yaml
 cp image_providers.yaml.example image_providers.yaml
 ```
 
-编辑配置文件，填入你的 API Key 和服务配置。也可以启动后在 Web 界面的**设置页面**进行配置。
+Edit the config files with your API Key and service settings, or configure them later via the **Settings** page in the web UI.
 
-### 3. 安装后端依赖
+### 3. Install Backend Dependencies
 ```bash
 uv sync
 ```
 
-### 4. 安装前端依赖
+### 4. Install Frontend Dependencies
 ```bash
 cd frontend
 pnpm install
 ```
 
-### 5. 启动服务
+### 5. Start the Services
 
-#### 一键启动（推荐）
+#### One-Click Start (Recommended)
 
-双击运行启动脚本，自动安装依赖并启动前后端：
+Run the start script to automatically install dependencies and launch both frontend and backend:
 
-- **macOS**: `start.sh` 或双击 `scripts/start-macos.command`
+- **macOS**: `start.sh` or double-click `scripts/start-macos.command`
 - **Linux**: `./start.sh`
-- **Windows**: 双击 `start.bat`
+- **Windows**: Double-click `start.bat`
 
-启动后自动打开浏览器访问 http://localhost:5173
+The browser will automatically open at http://localhost:5173
 
-#### 手动启动
+#### Manual Start
 
-**启动后端:**
+**Start Backend:**
 ```bash
 uv run python -m backend.app
 ```
-访问: http://localhost:12398
+Visit: http://localhost:12398
 
-**启动前端:**
+**Start Frontend:**
 ```bash
 cd frontend
 pnpm dev
 ```
-访问: http://localhost:5173
+Visit: http://localhost:5173
 
 ---
 
-## 🔧 配置说明
+## 🔧 Configuration
 
-### 配置方式
+### Configuration Methods
 
-项目支持两种配置方式：
+The project supports two configuration methods:
 
-1. **Web 界面配置（推荐）**：启动服务后，在设置页面可视化配置
-2. **YAML 文件配置**：直接编辑配置文件
+1. **Web UI (Recommended)**: Visual configuration via the Settings page after starting the service
+2. **YAML Files**: Edit config files directly
 
-### 文本生成配置
+### Text Generation Config
 
-配置文件: `text_providers.yaml`
+Config file: `text_providers.yaml`
 
 ```yaml
-# 当前激活的服务商
+# Active provider
 active_provider: openai
 
 providers:
-  # OpenAI 官方或兼容接口
+  # OpenAI or compatible API
   openai:
     type: openai_compatible
     api_key: sk-xxxxxxxxxxxxxxxxxxxx
     base_url: https://api.openai.com/v1
     model: gpt-4o
 
-  # Google Gemini（原生接口）
+  # Google Gemini (native API)
   gemini:
     type: google_gemini
     api_key: AIzaxxxxxxxxxxxxxxxxxxxxxxxxx
     model: gemini-2.0-flash
 ```
 
-### 图片生成配置
+### Image Generation Config
 
-配置文件: `image_providers.yaml`
+Config file: `image_providers.yaml`
 
 ```yaml
-# 当前激活的服务商
+# Active provider
 active_provider: gemini
 
 providers:
-  # Google Gemini 图片生成
+  # Google Gemini image generation
   gemini:
     type: google_genai
     api_key: AIzaxxxxxxxxxxxxxxxxxxxxxxxxx
     model: gemini-3-pro-image-preview
-    high_concurrency: false  # 高并发模式
+    high_concurrency: false
 
-  # OpenAI 兼容接口
+  # OpenAI compatible API
   openai_image:
     type: image_api
     api_key: sk-xxxxxxxxxxxxxxxxxxxx
@@ -255,100 +250,114 @@ providers:
     high_concurrency: false
 ```
 
-### 高并发模式说明
+### High Concurrency Mode
 
-- **关闭（默认）**：图片逐张生成，适合 GCP 300$ 试用账号或有速率限制的 API
-- **开启**：图片并行生成（最多15张同时），速度更快，但需要 API 支持高并发
+- **Off (default)**: Images generated one by one — suitable for GCP $300 trial accounts or rate-limited APIs
+- **On**: Images generated in parallel (up to 15 simultaneously) — faster but requires API support for high concurrency
 
-⚠️ **GCP 300$ 试用账号不建议启用高并发**，可能会触发速率限制导致生成失败。
-
----
-
-## ⚠️ 注意事项
-
-1. **API 配额限制**:
-   - 注意 Gemini 和图片生成 API 的调用配额
-   - GCP 试用账号建议关闭高并发模式
-
-2. **生成时间**:
-   - 图片生成需要时间,请耐心等待（不要离开页面）
+⚠️ **Not recommended for GCP $300 trial accounts** — may trigger rate limits and cause generation failures.
 
 ---
 
-## 🤝 参与贡献
+## ⚠️ Notes
 
-欢迎提交 Issue 和 Pull Request!
+1. **API Quota Limits**:
+   - Be aware of Gemini and image generation API call quotas
+   - GCP trial accounts should keep high concurrency disabled
 
-如果这个项目对你有帮助,欢迎给个 Star ⭐
-
+2. **Generation Time**:
+   - Image generation takes time — please be patient (don't leave the page)
 
 ---
 
-## 更新日志
+## 🤝 Contributing
+
+Issues and Pull Requests are welcome!
+
+If this project helps you, please give it a Star ⭐
+
+---
+
+## Changelog
+
+### v1.4.2 (2026-03-15)
+- ✨ Added English README as default with language toggle (中文/English)
+- ✨ Added AI-generated English banner and showcase grid images
+- ✨ Added Claude Opus 4.5 to acknowledgments
+- ✨ Added shields.io badges (Stars, License, Docker Pulls, Release)
+- ✨ Added GitHub Issue/PR templates for standardized contributions
+- ✨ Added CONTRIBUTING.md and SECURITY.md
+- 🐛 Fixed `rstrip('/v1')` incorrectly stripping URL characters (e.g. `api.openai.com` → `api.openai.co`) — 5 occurrences across backend
+- 🐛 Fixed image API test connection failing for chat-based endpoints (Doubao/Volcengine) by using configured endpoint_type instead of hardcoded `/v1/models`
+- 🐛 Fixed bare `except:` clause replaced with `except Exception:` in history service
+- 🐛 Fixed SSE stream reader not released on error in frontend API layer (resource leak)
+- 🐛 Fixed 5 uncleared `setTimeout` calls in ContentDisplay component (memory leak)
+- 🐛 Fixed duplicate image regeneration requests by tracking in-progress indices
+- 🐛 Fixed GenerateView redirect timer not cleared on component unmount
 
 ### v1.4.1 (2025-12-29)
-- ✨ 新增一键启动脚本，支持 macOS/Linux/Windows
-- ✨ 新增文案生成功能，自动生成标题、正文和标签
-- 🔧 修复历史记录保存机制：大纲生成后立即保存，编辑时自动保存（300ms防抖）
-- 🔧 优化跳转逻辑：点击"开始生成"前强制保存未保存的修改
-- 🔧 统一启动脚本端口显示为 12398
-- 🔧 清理后端生成器未使用的重试装饰器代码
-- 🔧 修复前端 CSS 变量引用问题
-- 🔧 优化 checkHistoryExists 接口性能，使用专用端点
-- 🔧 规范 recordId 赋值方式，统一使用 setRecordId() 方法
+- ✨ Added one-click start scripts for macOS/Linux/Windows
+- ✨ Added copywriting generation: auto-generate titles, body text, and tags
+- 🔧 Fixed history saving: immediate save after outline generation, auto-save on edit (300ms debounce)
+- 🔧 Optimized navigation: force-save unsaved changes before clicking "Start Generation"
+- 🔧 Unified startup script port display to 12398
+- 🔧 Cleaned up unused retry decorator code in backend generators
+- 🔧 Fixed frontend CSS variable reference issues
+- 🔧 Optimized checkHistoryExists API performance with dedicated endpoint
+- 🔧 Standardized recordId assignment using setRecordId() method
 
 ### v1.4.0 (2025-11-30)
-- 🏗️ 后端架构重构：拆分单体路由为模块化蓝图（history、images、generation、outline、config）
-- 🏗️ 前端组件重构：提取可复用组件（ImageGalleryModal、OutlineModal、ShowcaseBackground等）
-- ✨ 优化首页设计，移除冗余内容区块
-- ✨ 背景图片预加载和渐入动画，提升加载体验
-- ✨ 历史记录持久化支持（Docker部署）
-- 🔧 修复历史记录预览和大纲查看功能
-- 🔧 优化Modal组件可见性控制
-- 🧪 新增65个后端单元测试
+- 🏗️ Backend refactored: split monolithic routes into modular blueprints (history, images, generation, outline, config)
+- 🏗️ Frontend refactored: extracted reusable components (ImageGalleryModal, OutlineModal, ShowcaseBackground, etc.)
+- ✨ Optimized homepage design, removed redundant content blocks
+- ✨ Background image preloading with fade-in animation for better loading experience
+- ✨ History persistence support (Docker deployment)
+- 🔧 Fixed history preview and outline viewing
+- 🔧 Optimized Modal component visibility control
+- 🧪 Added 65 backend unit tests
 
 ### v1.3.0 (2025-11-26)
-- ✨ 新增 Docker 支持，一键部署
-- ✨ 发布官方 Docker 镜像到 Docker Hub: `histonemax/redink`
-- 🔧 Flask 自动检测前端构建产物，支持单容器部署
-- 🔧 Docker 镜像内置空白配置模板，保护 API Key 安全
-- 📝 更新 README，添加 Docker 部署说明
+- ✨ Added Docker support for one-click deployment
+- ✨ Published official Docker image to Docker Hub: `histonemax/redink`
+- 🔧 Flask auto-detects frontend build artifacts for single-container deployment
+- 🔧 Docker image includes blank config templates to protect API Key security
+- 📝 Updated README with Docker deployment instructions
 
 ### v1.2.0 (2025-11-26)
-- ✨ 新增版权信息展示，所有页面显示开源协议和项目链接
-- ✨ 优化图片重新生成功能，支持单张图片重绘
-- ✨ 重新生成图片时保持风格一致，传递完整上下文（封面图、大纲、用户输入）
-- ✨ 修复图片缓存问题，重新生成的图片立即刷新显示
-- ✨ 统一文本生成客户端接口，支持 Google Gemini 和 OpenAI 兼容接口自动切换
-- ✨ 新增 Web 界面配置功能，可视化管理 API 服务商
-- ✨ 新增高并发模式开关，适配不同 API 配额
-- ✨ API Key 脱敏显示，保护密钥安全
-- ✨ 配置自动保存，修改即时生效
-- 🔧 调整默认 max_output_tokens 为 8000，兼容更多模型限制
-- 🔧 优化前端路由和页面布局，提升用户体验
-- 🔧 简化配置文件结构，移除冗余参数
-- 🔧 优化历史记录图片显示，使用缩略图节省带宽
-- 🔧 历史记录重新生成时自动从文件系统加载封面图作为参考
-- 🐛 修复 `store.updateImage` 方法缺失导致的重新生成失败问题
-- 🐛 修复历史记录加载时图片 URL 拼接错误
-- 🐛 修复下载功能中原图参数处理问题
-- 🐛 修复图片加载 500 错误问题
+- ✨ Added copyright info display on all pages
+- ✨ Improved image regeneration with single image redraw support
+- ✨ Regenerated images maintain style consistency with full context (cover, outline, user input)
+- ✨ Fixed image cache issues — regenerated images refresh immediately
+- ✨ Unified text generation client supporting Google Gemini and OpenAI-compatible APIs with auto-switching
+- ✨ Added web UI configuration for visual API provider management
+- ✨ Added high concurrency mode toggle for different API quotas
+- ✨ API Key masking for security
+- ✨ Auto-save configuration with instant effect
+- 🔧 Adjusted default max_output_tokens to 8000 for broader model compatibility
+- 🔧 Optimized frontend routing and page layout for better UX
+- 🔧 Simplified config file structure, removed redundant parameters
+- 🔧 Optimized history image display with thumbnails to save bandwidth
+- 🔧 History regeneration auto-loads cover image from filesystem as reference
+- 🐛 Fixed missing `store.updateImage` method causing regeneration failure
+- 🐛 Fixed image URL concatenation error during history loading
+- 🐛 Fixed raw image parameter handling in download function
+- 🐛 Fixed image loading 500 error
 
 ---
 
-## 交流讨论与赞助
+## Community & Support
 
 - **GitHub Issues**: [https://github.com/HisMax/RedInk/issues](https://github.com/HisMax/RedInk/issues)
 
-### 联系作者
+### Contact the Author
 
 - **Email**: histonemax@gmail.com
-- **微信**: Histone2024（添加请注明来意）
+- **WeChat**: Histone2024 (please state your purpose)
 - **GitHub**: [@HisMax](https://github.com/HisMax)
 
-### 用爱发电，如果可以，请默子喝一杯☕️咖啡吧
+### Support the Project
 
-<img src="images/coffee.jpg" alt="赞赏码" width="300"/>
+<img src="images/coffee.jpg" alt="Buy me a coffee" width="300"/>
 
 ## Star History
 
@@ -356,67 +365,67 @@ providers:
 
 ---
 
-## 📄 开源协议
+## 📄 License
 
-### 个人使用 - CC BY-NC-SA 4.0
+### Personal Use - CC BY-NC-SA 4.0
 
-本项目采用 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) 协议进行开源
+This project is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
-**你可以自由地：**
-- ✅ **个人使用** - 用于学习、研究、个人项目
-- ✅ **分享** - 在任何媒介以任何形式复制、发行本作品
-- ✅ **修改** - 修改、转换或以本作品为基础进行创作
+**You are free to:**
+- ✅ **Personal Use** — for learning, research, and personal projects
+- ✅ **Share** — copy and redistribute the material in any medium or format
+- ✅ **Adapt** — remix, transform, and build upon the material
 
-**但需要遵守以下条款：**
-- 📝 **署名** - 必须给出适当的署名，提供指向本协议的链接，同时标明是否对原始作品作了修改
-- 🚫 **非商业性使用** - 不得将本作品用于商业目的
-- 🔄 **相同方式共享** - 如果你修改、转换或以本作品为基础进行创作，你必须以相同的协议分发你的作品
+**Under the following terms:**
+- 📝 **Attribution** — You must give appropriate credit, provide a link to the license, and indicate if changes were made
+- 🚫 **NonCommercial** — You may not use the material for commercial purposes
+- 🔄 **ShareAlike** — If you remix, transform, or build upon the material, you must distribute your contributions under the same license
 
-### 商业授权
+### Commercial License
 
-如果你希望将本项目用于**商业目的**（包括但不限于）：
-- 提供付费服务
-- 集成到商业产品
-- 作为 SaaS 服务运营
-- 其他盈利性用途
+If you wish to use this project for **commercial purposes** (including but not limited to):
+- Providing paid services
+- Integrating into commercial products
+- Operating as a SaaS service
+- Other for-profit uses
 
-**请联系作者获取商业授权：**
+**Please contact the author for a commercial license:**
 - 📧 Email: histonemax@gmail.com
-- 💬 微信: Histone2024（请注明"商业授权咨询"）
+- 💬 WeChat: Histone2024 (please note "Commercial License Inquiry")
 
-默子会根据你的具体使用场景提供灵活的商业授权方案。
-
----
-
-### 免责声明
-
-本软件按"原样"提供，不提供任何形式的明示或暗示担保，包括但不限于适销性、特定用途的适用性和非侵权性的担保。在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责。
+The author will provide flexible commercial licensing options based on your specific use case.
 
 ---
 
-## 🙏 致谢
+### Disclaimer
 
-- [Google Gemini](https://ai.google.dev/) - 强大的文案生成能力
-- 图片生成服务提供商 - 惊艳的图片生成效果
-- [Linux.do](https://linux.do/) - 优秀的开发者社区
+This software is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages, or other liability.
 
 ---
 
-## 👨‍💻 作者
+## 🙏 Acknowledgments
 
-**默子 (Histone)** - AI 创业者 
+- [Google Gemini](https://ai.google.dev/) — Powerful text generation capabilities
+- [Claude Opus 4.5](https://www.anthropic.com/) — Intelligent code assistance and development support
+- Image generation service providers — Stunning image generation
+- [Linux.do](https://linux.do/) — Excellent developer community
 
-- 🏠 位置: 中国杭州
-- 🚀 状态: 创业中
+---
+
+## 👨‍💻 Author
+
+**Mozi (Histone)** - AI Entrepreneur
+
+- 🏠 Location: Hangzhou, China
+- 🚀 Status: Startup in progress
 - 📧 Email: histonemax@gmail.com
-- 💬 微信: Histone2024 （私人微信不解答任何技术问题）
+- 💬 WeChat: Histone2024 (personal WeChat — no tech support)
 - 🐙 GitHub: [@HisMax](https://github.com/HisMax)
-- 
 
-*"让 AI 帮我们做更有创造力的事"*
+*"Let AI do the creative work for us"*
 
 ---
 
-**如果这个项目帮到了你,欢迎分享给更多人!** ⭐
+**If this project helped you, share it with others!** ⭐
 
-有任何问题或建议,欢迎提 Issue !
+Questions or suggestions? Feel free to open an Issue!

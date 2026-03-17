@@ -96,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGeneratorStore } from '../stores/generator'
 import { generateImagesPost, regenerateImage as apiRegenerateImage, retryFailedImages as apiRetryFailed, createHistory, updateHistory, getImageUrl } from '../api'
@@ -106,6 +106,9 @@ const store = useGeneratorStore()
 
 const error = ref('')
 const isRetrying = ref(false)
+const redirectTimer = ref<number | null>(null)
+const regeneratingIndices = ref(new Set<number>())
+let isUnmounted = false
 
 const isGenerating = computed(() => store.progress.status === 'generating')
 
@@ -130,10 +133,13 @@ const getStatusText = (status: string) => {
 
 // 重试单张图片（异步并发执行，不阻塞）
 function retrySingleImage(index: number) {
-  if (!store.taskId) return
+  if (!store.taskId || regeneratingIndices.value.has(index)) return
 
   const page = store.outline.pages.find(p => p.index === index)
   if (!page) return
+
+  // 标记为正在重绘
+  regeneratingIndices.value.add(index)
 
   // 立即设置为重试状态
   store.setImageRetrying(index)
@@ -155,6 +161,9 @@ function retrySingleImage(index: number) {
     })
     .catch(e => {
       store.updateProgress(index, 'error', undefined, String(e))
+    })
+    .finally(() => {
+      regeneratingIndices.value.delete(index)
     })
 }
 
@@ -339,8 +348,10 @@ onMounted(async () => {
 
       // 如果没有失败的，跳转到结果页
       if (!hasFailedImages.value) {
-        setTimeout(() => {
-          router.push('/result')
+        redirectTimer.value = window.setTimeout(() => {
+          if (!isUnmounted) {
+            router.push('/result')
+          }
         }, 1000)
       }
     },
@@ -354,6 +365,14 @@ onMounted(async () => {
     // userTopic - 用户原始输入
     store.topic
   )
+})
+
+onUnmounted(() => {
+  isUnmounted = true
+  if (redirectTimer.value !== null) {
+    clearTimeout(redirectTimer.value)
+    redirectTimer.value = null
+  }
 })
 </script>
 

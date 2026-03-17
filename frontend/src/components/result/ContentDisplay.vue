@@ -134,7 +134,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { useGeneratorStore } from '../../stores/generator'
 import { generateContent } from '../../api'
 
@@ -146,6 +146,21 @@ const copiedCopywriting = ref(false)
 const copiedTags = ref(false)
 const copiedTitleIndex = ref<number | null>(null)
 const copiedTagIndex = ref<number | null>(null)
+const copyTimers: number[] = []
+
+function setCopyTimeout(fn: () => void, ms: number) {
+  const id = window.setTimeout(() => {
+    fn()
+    const idx = copyTimers.indexOf(id)
+    if (idx !== -1) copyTimers.splice(idx, 1)
+  }, ms)
+  copyTimers.push(id)
+}
+
+onUnmounted(() => {
+  copyTimers.forEach(id => clearTimeout(id))
+  copyTimers.length = 0
+})
 
 const content = computed(() => store.content)
 
@@ -206,7 +221,7 @@ async function copyTitles() {
   const text = content.value.titles.join('\n')
   if (await copyToClipboard(text)) {
     copiedTitles.value = true
-    setTimeout(() => copiedTitles.value = false, 2000)
+    setCopyTimeout(() => copiedTitles.value = false, 2000)
   }
 }
 
@@ -214,7 +229,7 @@ async function copyTitles() {
 async function copyTitle(title: string, index: number) {
   if (await copyToClipboard(title)) {
     copiedTitleIndex.value = index
-    setTimeout(() => copiedTitleIndex.value = null, 2000)
+    setCopyTimeout(() => copiedTitleIndex.value = null, 2000)
   }
 }
 
@@ -222,7 +237,7 @@ async function copyTitle(title: string, index: number) {
 async function copyCopywriting() {
   if (await copyToClipboard(content.value.copywriting)) {
     copiedCopywriting.value = true
-    setTimeout(() => copiedCopywriting.value = false, 2000)
+    setCopyTimeout(() => copiedCopywriting.value = false, 2000)
   }
 }
 
@@ -231,7 +246,7 @@ async function copyTags() {
   const text = content.value.tags.map(t => `#${t}`).join(' ')
   if (await copyToClipboard(text)) {
     copiedTags.value = true
-    setTimeout(() => copiedTags.value = false, 2000)
+    setCopyTimeout(() => copiedTags.value = false, 2000)
   }
 }
 
@@ -239,7 +254,7 @@ async function copyTags() {
 async function copyTag(tag: string, index: number) {
   if (await copyToClipboard(`#${tag}`)) {
     copiedTagIndex.value = index
-    setTimeout(() => copiedTagIndex.value = null, 2000)
+    setCopyTimeout(() => copiedTagIndex.value = null, 2000)
   }
 }
 </script>

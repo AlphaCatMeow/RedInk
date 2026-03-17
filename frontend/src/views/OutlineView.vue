@@ -250,10 +250,31 @@ let saveTimer: number | null = null
  * 当大纲内容发生变化时，自动更新到后端
  */
 const autoSaveOutline = async () => {
-  // 如果没有 recordId，说明还未创建历史记录，无法自动保存
+  // 如果没有 recordId，尝试创建历史记录
   if (!store.recordId) {
-    console.warn('未找到历史记录ID，无法自动保存')
-    return
+    if (store.outline.pages && store.outline.pages.length > 0) {
+      try {
+        const result = await createHistory(
+          store.topic || '未命名主题',
+          {
+            raw: store.outline.raw,
+            pages: store.outline.pages
+          },
+          store.taskId || undefined
+        )
+        if (result.success && result.record_id) {
+          store.setRecordId(result.record_id)
+        } else {
+          console.warn('自动保存：创建历史记录失败')
+          return
+        }
+      } catch (error) {
+        console.error('自动保存：创建历史记录出错:', error)
+        return
+      }
+    } else {
+      return
+    }
   }
 
   // 如果没有大纲内容，不需要保存
@@ -339,8 +360,8 @@ const checkAndCreateHistory = async () => {
 }
 
 // 组件挂载时检查历史记录
-onMounted(() => {
-  checkAndCreateHistory()
+onMounted(async () => {
+  await checkAndCreateHistory()
 })
 
 // 组件卸载时清理定时器
